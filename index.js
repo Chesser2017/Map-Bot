@@ -16,7 +16,7 @@ for(const file of commandFiles){
 }
 
 client.once('ready', async() => {
-    client.user.setActivity('evades.io | .help', {type: "PLAYING"});;
+    client.user.setActivity('.help', {type: "PLAYING"});;
     console.log('ready');
 })
 
@@ -56,9 +56,6 @@ client.on('message', async msg => {
     const command = client.commands.get(commandName) 
         || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
     if(!command) return;
-    if(command.modOnly && !msg.member.hasPermission('MANAGE_ROLES')){
-        return msg.reply(` you do not have the permissions for that message!`)
-    }
     try{
         command.execute(msg, arguments, client);
     }
