@@ -30,4 +30,4 @@ module.exports = sequelize.define('Users', {
     }
 })
 
-sequelize.sync({force: true});
+//sequelize.sync({force: true});

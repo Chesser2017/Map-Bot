@@ -31,9 +31,12 @@ client.on('message', async msg => {
         let newCurrency = userBank.dataValues.currency;
         if(increase >= 100 + ((newlevel - 1) * 75)){
             increase = 0;
+            let currencyIncrease = 60 + ((newlevel - 1) * 5);
+            let rubyEmoji = client.emojis.get('626941464991105057');
+            let a = Math.floor((Math.random() * 20) + currencyIncrease);
+            newCurrency +=  a;
             newlevel++;
-            newCurrency +=  Math.floor((Math.random() * 100) + 50);
-            msg.channel.send(`${msg.author} is now LEVEL ${newlevel}!`);
+            msg.channel.send(`${msg.author} is now LEVEL ${newlevel} and gained ${a}${rubyEmoji}!`);
         }
         await Users.update({
             current_xp: increase,
@@ -48,7 +51,7 @@ client.on('message', async msg => {
     if(!msg.content.startsWith(prefix) || !msg.guild) return;
 
     const arguments = msg.content.slice(prefix.length).split(/ +/);
-    const commandName = arguments[0];
+    const commandName = arguments.shift();
     
     const command = client.commands.get(commandName) 
         || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
