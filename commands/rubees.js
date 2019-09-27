@@ -54,6 +54,5 @@ module.exports = {
             return msg.channel.send(reply);
         }
     },
-    modOnly: true,
-    aliases: ['a', 'increase']
+    modOnly: true
 }

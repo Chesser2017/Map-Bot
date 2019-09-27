@@ -22,6 +22,8 @@ client.once('ready', async() => {
 
 client.on('message', async msg => {
     if(msg.author.bot) return;
+    if(msg.mentions.users.first() == client.user)
+        return msg.reply(` the prefix is \`${prefix}\`!\n.help to see all the commands.`);
     if(!xpGain.some(id => id === msg.author.id)){
         let userBank = await fetchBank(msg.author);
         xpGain.push(msg.author.id);
@@ -29,6 +31,7 @@ client.on('message', async msg => {
         let increase = userBank.dataValues.current_xp + Math.floor(Math.random() * 11) + 10;
         let newlevel =  userBank.dataValues.level;
         let newCurrency = userBank.dataValues.currency;
+
         if(increase >= 100 + ((newlevel - 1) * 75)){
             increase = 0;
             let currencyIncrease = 60 + ((newlevel - 1) * 5);
