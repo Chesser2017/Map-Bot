@@ -26,16 +26,23 @@ client.on('message', async msg => {
     
     //Leveling Logic START
     if(!xpGain.some(id => id === msg.author.id)){
+        //If the user is in the array, that means they gained xp already
+        //and need to wait
+        //Since adding xp to user here, must add to array too
         let userBank = await fetchBank(msg.author);
         xpGain.push(msg.author.id);
 
-        let increase = userBank.dataValues.current_xp + Math.floor(Math.random() * 11) + 10;
+        let increase = Math.floor(Math.random() * 11) + 10;
         let newlevel =  userBank.dataValues.level;
         let newCurrency = userBank.dataValues.currency;
         let inventory = JSON.parse(userBank.dataValues.inventory);
+
         if(inventory.includes('XP Booster')){
             increase = Math.floor(increase * 1.3);
         }
+        increase += userBank.dataValues.current_xp;
+        
+        //Equation to handle if user should level up.
         if(increase >= 100 + ((newlevel - 1) * 75)){
             increase = 0;
             let currencyIncrease = 60 + ((newlevel - 1) * 5);
@@ -45,11 +52,14 @@ client.on('message', async msg => {
             newlevel++;
             msg.channel.send(`${msg.author} is now LEVEL ${newlevel} and gained ${a}${rubyEmoji}!`);
         }
+
         await Users.update({
             current_xp: increase,
             level: newlevel,
             currency: newCurrency
         }, {where:{ user_id: msg.author.id}});
+
+        //Clear the user from the array so that he can gain xp after a while
         setTimeout(() => {
             xpGain.splice(xpGain.indexOf(msg.author.id), 1);
         }, ((Math.random() * 11) + 15) * 1000);
