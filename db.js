@@ -27,6 +27,10 @@ module.exports = sequelize.define('Users', {
         type: Sequelize.INTEGER,
         defaultValue: 0,
         allowNull: false
+    },
+    inventory: {
+        type: Sequelize.STRING,
+        defaultValue: `[]`
     }
 })
 

@@ -3,7 +3,6 @@ const fs = require('fs');
 const Users = require('./db.js');
 let {fetchBank} = require('./functions.js');
 const {prefix, token} = require('./config.json');
-
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const xpGain = [];
@@ -15,15 +14,17 @@ for(const file of commandFiles){
     client.commands.set(command.name, command);
 }
 
-client.once('ready', async() => {
-    client.user.setActivity('.help', {type: "PLAYING"});;
+client.once('ready', () => {
+    client.user.setActivity(`${prefix}help`, {type: "PLAYING"});
     console.log('ready');
 })
 
 client.on('message', async msg => {
-    if(msg.author.bot) return;
+    if(msg.author.bot || !msg.guild ) return;
     if(msg.mentions.users.first() == client.user)
-        return msg.reply(` the prefix is \`${prefix}\`!\n.help to see all the commands.`);
+        return msg.reply(` the prefix is \`${prefix}\`!\n${prefix}help to see all the commands.`);
+    
+    //Leveling Logic START
     if(!xpGain.some(id => id === msg.author.id)){
         let userBank = await fetchBank(msg.author);
         xpGain.push(msg.author.id);
@@ -31,12 +32,15 @@ client.on('message', async msg => {
         let increase = userBank.dataValues.current_xp + Math.floor(Math.random() * 11) + 10;
         let newlevel =  userBank.dataValues.level;
         let newCurrency = userBank.dataValues.currency;
-
+        let inventory = JSON.parse(userBank.dataValues.inventory);
+        if(inventory.includes('XP Booster')){
+            increase = Math.floor(increase * 1.3);
+        }
         if(increase >= 100 + ((newlevel - 1) * 75)){
             increase = 0;
             let currencyIncrease = 60 + ((newlevel - 1) * 5);
             let rubyEmoji = client.emojis.get('626941464991105057');
-            let a = Math.floor((Math.random() * 20) + currencyIncrease);
+            let a = Math.floor((Math.random() * 21) + currencyIncrease);
             newCurrency +=  a;
             newlevel++;
             msg.channel.send(`${msg.author} is now LEVEL ${newlevel} and gained ${a}${rubyEmoji}!`);
@@ -50,8 +54,9 @@ client.on('message', async msg => {
             xpGain.splice(xpGain.indexOf(msg.author.id), 1);
         }, ((Math.random() * 11) + 15) * 1000);
     }
+    //Leveling Logic END
 
-    if(!msg.content.startsWith(prefix) || !msg.guild) return;
+    if(!msg.content.startsWith(prefix)) return;
 
     const arguments = msg.content.slice(prefix.length).split(/ +/);
     const commandName = arguments.shift();
