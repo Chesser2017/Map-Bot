@@ -6,6 +6,7 @@ module.exports = {
     description: 'Displays a users profile',
     async execute(msg, args, client){
         let user = msg.mentions.users.first() || msg.author;
+        if(user.bot) return;
         let userBank = await fetchBank(user);
         let rubyEmoji = client.emojis.get('626941464991105057');
         let inventory = JSON.parse(userBank.dataValues.inventory);

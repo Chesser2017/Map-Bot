@@ -9,6 +9,7 @@ module.exports = {
         if(!msg.member.roles.has('625868222339481600') && !msg.member.roles.has('601938916869799937')) return msg.reply(', you must be a Rubee Banker or Admin!');
         
         let user = msg.mentions.users.first() || msg.author;
+        if(user.bot) return;
         let rubyEmoji = client.emojis.get('626941464991105057');
 
         if(args[0] === "add"){
