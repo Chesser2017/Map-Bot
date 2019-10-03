@@ -49,13 +49,13 @@ module.exports = {
         console.log(botChoice, userChoice);
         //Finishes the game
         if(tie)
-            return msg.reply(` we tied!`);
+            return msg.reply(` you chose ${userChoice} and I chose ${botChoice}. We tied!`);
         if(userWon){
             currency += 10;
             await Users.update({currency}, {where: {user_id: msg.author.id}});
-            return msg.reply(` you won and gained 10 ${rubyEmoji}!`);
+            return msg.reply(` you chose ${userChoice} and I chose ${botChoice}. You won and gained 10 ${rubyEmoji}!`);
         }
-        return msg.reply(` you lost!`);
+        return msg.reply(` you chose ${userChoice} and I chose ${botChoice}. You lost.`);
     },
     aliases: [],
     modOnly: false
