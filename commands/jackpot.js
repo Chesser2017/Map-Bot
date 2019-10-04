@@ -22,6 +22,7 @@ module.exports = {
             return msg.reply(` you won and have gained 2000 ${rubyEmoji}!`);
         }
         currency -= 150;
+        currency < 0 ? currency = 0 : currency = currency;
         await Users.update({currency}, 
             {where: {user_id: msg.author.id}});
         return msg.reply(` you lost 150 ${rubyEmoji}.`);
