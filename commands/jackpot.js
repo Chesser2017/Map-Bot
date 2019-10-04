@@ -13,18 +13,18 @@ module.exports = {
         if(!inventory.includes('Jackpot'))
             return msg.reply(` you have to buy jackpot from the store!`);
         
-        const randNum = Math.floor(Math.random() * 10);
+        const randNum = Math.floor(Math.random() * 20);
 
         if(randNum === 7){
-            currency += 150;
+            currency += 2000;
             await Users.update({currency},
                  {where: {user_id: msg.author.id}});
-            return msg.reply(` you won and have gained 150 ${rubyEmoji}`);
+            return msg.reply(` you won and have gained 2000 ${rubyEmoji}!`);
         }
-        currency -= 15;
+        currency -= 150;
         await Users.update({currency}, 
             {where: {user_id: msg.author.id}});
-        return msg.reply(` you lost 15 ${rubyEmoji}.`);
+        return msg.reply(` you lost 150 ${rubyEmoji}.`);
     },
     aliases: ['jp', 'pot'],
     modOnly: false
