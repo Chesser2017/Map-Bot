@@ -21,9 +21,8 @@ client.once('ready', () => {
 
 client.on('message', async msg => {
     if(msg.author.bot || !msg.guild ) return;
-    if(msg.mentions.users.first() == client.user)
+    if(msg.content.startsWith('<@626347132986851338>'))
         return msg.reply(` the prefix is \`${prefix}\`!\n${prefix}help to see all the commands.`);
-    
     //Leveling Logic START
     if(!xpGain.some(id => id === msg.author.id)){
         //If the user is in the array, that means they gained xp already

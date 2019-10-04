@@ -16,7 +16,7 @@ class Item {
 }
 
 //NOTE: Inventory is stored as a string
-const buyItem = async paramObj => {
+const buyMinigame = async paramObj => {
     const user = paramObj.user;
     const itemName = paramObj.itemName;
     const msg = paramObj.msg;
@@ -73,31 +73,24 @@ const buyRole = async paramObj => {
     const msg = paramObj.msg;
     const newCurrency = paramObj.newCurrency;
     const filter = m => m.author.id === user.id;
+    const botMaking = msg.guild.channels.get('621148039200899072');
 
     //Collect messages, then push messages to answer array
-    msg.channel.send(`Type, in 2 messages, first the color(hex code) and then the name of the role.`);
+    msg.channel.send(`Type, in 2 messages, first the name and then the colour of the role.`);
     const collected = await msg.channel.awaitMessages(filter, {time: 60000, max: 3});
+
     const answers = [];
     for(let msg of collected){
         answers.push(msg[1].content);
     }
     
-    const role = await msg.guild.createRole({
-        color: answers[0],
-        name: answers[1],
-        position: 52
-    })
-    
-    msg.member.addRole(role);
+    botMaking.send(`User: ${user.tag}\nRole Name: ${answers[0]}\nRole Colour: ${answers[1]}`);
+
     await Users.update({
         currency: newCurrency
     }, {where: {user_id: user.id}});
-
-    setTimeout(() => {
-        role.delete();
-    }, 1000 * 60 * 60 * 24 * 7);
-
-    return msg.channel.send(`Successfully purchased a custom role.`)
+    
+    return msg.channel.send(`Successfully purchased a custom role. Please wait for a staff member to add it.`);
 }
 new Item(`XP Booster`, `xp`,
     `Boosts your XP earned by 30% for 3 hours.`,
@@ -105,19 +98,19 @@ new Item(`XP Booster`, `xp`,
 
 new Item(`Custom Role`, `custom-role`,
     `Gives a custom role for a week.`,
-    1000, 0, buyRole); 
+    3000, 0, buyRole); 
 
 new Item(`Rock, Paper, Scissors`, `rps`,
     `Gives you access to play rock, paper, scissors, and if you win, you get +10 rubees`,
-    0, 2, buyItem);
+    0, 2, buyMinigame);
 
 new Item(`Roulette`, `roulette`,
     `You can play roulette, and if you win, you earn +30 rubees`,
-    0, 3, buyItem);
+    0, 3, buyMinigame);
 
 new Item(`Jackpot`, `jackpot`,
     `You have a very small chance in winning, ending up victorious gives you a profit of 150 rubees`,
-    0, 5, buyItem);
+    0, 5, buyMinigame);
 
 
 module.exports = items;
