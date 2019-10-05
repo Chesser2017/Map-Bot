@@ -31,6 +31,14 @@ module.exports = sequelize.define('Users', {
     inventory: {
         type: Sequelize.STRING,
         defaultValue: `[]`
+    },
+    slotLevel: {
+        type: Sequelize.INTEGER,
+        defaultValue: 1
+    },
+    rare_currency: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
     }
 })
 
