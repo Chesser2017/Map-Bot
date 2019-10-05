@@ -1,11 +1,11 @@
 const Users = require('../db.js');
 const {fetchBank} = require('../functions.js');
-
+const {rubyEmojiID} = require('../config.json');
 module.exports = {
     name: "jackpot",
     description: "Play jackpot! You have a small chance of winning though.",
     async execute(msg, args, client){
-        const rubyEmoji = client.emojis.get('626941464991105057');
+        const rubyEmoji = client.emojis.get(rubyEmojiID);
         const userBank = await fetchBank(msg.author);
         const inventory = JSON.parse(userBank.dataValues.inventory);
         let currency = userBank.dataValues.currency;

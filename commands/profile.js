@@ -1,6 +1,7 @@
 const {fetchBank} = require('../functions.js');
 const Discord = require('discord.js');
 const Users = require('../db.js');
+const {rubyEmojiID} = require('../config.json');
 module.exports = {
     name: 'profile',
     description: 'Displays a users profile',
@@ -8,7 +9,7 @@ module.exports = {
         let user = msg.mentions.users.first() || msg.author;
         if(user.bot) return;
         let userBank = await fetchBank(user);
-        let rubyEmoji = client.emojis.get('626941464991105057');
+        let rubyEmoji = client.emojis.get(rubyEmojiID);
         let inventory = JSON.parse(userBank.dataValues.inventory);
         let string = '';
         for(let i = 0; i < inventory.length; i++){

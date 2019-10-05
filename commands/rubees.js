@@ -1,6 +1,7 @@
 const Users = require('../db.js');
 const {fetchBank} = require('../functions.js');
 const Discord = require('discord.js');
+const {rubyEmojiID} = require('../config.json');
 module.exports = {
     name: 'r',
     description: 'Changes the rubees of a user depending on arguments. Use ".r add/subtract amount (user) or .r reset (user)"',
@@ -10,7 +11,7 @@ module.exports = {
         
         let user = msg.mentions.users.first() || msg.author;
         if(user.bot) return;
-        let rubyEmoji = client.emojis.get('626941464991105057');
+        let rubyEmoji = client.emojis.get(rubyEmojiID);
 
         if(args[0] === "add"){
             let rubeesToAdd = parseInt(args[1]);

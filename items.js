@@ -76,7 +76,7 @@ const buyRole = async paramObj => {
     const botMaking = msg.guild.channels.get('621148039200899072');
 
     //Collect messages, then push messages to answer array
-    msg.channel.send(`Type, in 2 messages, first the name and then the colour of the role.`);
+    msg.channel.send(`Type, in 2 messages, first the name and then the colour(preferably hex code) of the role.`);
     const collected = await msg.channel.awaitMessages(filter, {time: 60000, max: 3});
 
     const answers = [];
@@ -84,13 +84,21 @@ const buyRole = async paramObj => {
         answers.push(msg[1].content);
     }
     
+    const customRole = await msg.guild.createRole({
+        name: answers[0],
+        color: answers[1],
+        position: 31
+    })
+
     botMaking.send(`User: ${user.tag}\nRole Name: ${answers[0]}\nRole Colour: ${answers[1]}`);
+
+    msg.member.addRole(customRole);
 
     await Users.update({
         currency: newCurrency
     }, {where: {user_id: user.id}});
-    
-    return msg.channel.send(`Successfully purchased a custom role. Please wait for a staff member to add it.`);
+
+    return msg.channel.send(`Successfully purchased a custom role.`);
 }
 new Item(`XP Booster`, `xp`,
     `Boosts your XP earned by 30% for 3 hours.`,

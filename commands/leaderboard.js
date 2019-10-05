@@ -1,13 +1,13 @@
 const Users = require('../db.js');
 const Discord = require('discord.js');
-
+const {rubyEmojiID} = require('../config.json');
 module.exports = {
     name: "leaderboard",
     description: "Displays the top 10 users in the server",
     async execute(msg, args, client){
         
         const userBanks = await Users.findAll({attributes: ['user_id', 'currency']});
-        const rubyEmoji = client.emojis.get('626941464991105057');
+        const rubyEmoji = client.emojis.get(rubyEmojiID);
         let leaderboard = [];
 
         //The pages inside this object is mapped by page number, with the value
