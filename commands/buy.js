@@ -2,12 +2,14 @@ const Discord = require('discord.js');
 const {fetchBank} = require('../functions.js');
 const Users = require('../db.js');
 const items = require('../items.js');
-const {rubyEmojiID} = require('../config.json');
+const {rubyEmojiID, ancientCrystalEmojiID} = require('../config.json');
+
 module.exports = {
     name: "buy",
     description: "Buy an item from the shop. Use it like .buy (item_name)",
     async execute(msg, args, client){
         const rubyEmoji = client.emojis.get(rubyEmojiID);
+        const acemoji = client.emojis.get(ancientCrystalEmojiID);
         if(args.length < 1){
             let reply = new Discord.RichEmbed()
                         .setAuthor(client.user.username, client.user.avatarURL)
@@ -37,7 +39,9 @@ module.exports = {
             user: msg.author,
             itemName: item.name,
             msg,
-            newCurrency
+            newCurrency,
+            acemoji,
+            client
         });
     },
     aliases: ['get', 'b'],

@@ -83,5 +83,6 @@ module.exports = {
         }, 1000 * 60 * 2);
     },
     aliases: [],
-    modOnly: false
+    modOnly: false,
+    slotMappings
 }

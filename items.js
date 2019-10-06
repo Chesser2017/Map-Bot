@@ -1,6 +1,8 @@
 const items = [];
 const {fetchBank} = require('./functions.js');
 const Users = require('./db.js');
+const Discord = require('discord.js');
+const {slotMappings} = require('./commands/summon.js');
 
 class Item {
     constructor(name, buyingName, description, cost, minLevel, performer){
@@ -17,6 +19,7 @@ class Item {
 
 //NOTE: Inventory is stored as a string
 const buyMinigame = async paramObj => {
+    //Storing variables from parameter object
     const user = paramObj.user;
     const itemName = paramObj.itemName;
     const msg = paramObj.msg;
@@ -37,9 +40,11 @@ const buyMinigame = async paramObj => {
     msg.channel.send(`Successfully bought ${itemName}.`)
 }
 const buyXP = async paramObj => {
+    //Storing variables from parameter object
     const user = paramObj.user;
     const msg = paramObj.msg;
     const newCurrency = paramObj.newCurrency;
+
     let userBank = await fetchBank(user);
     let userInventory = JSON.parse(userBank.dataValues.inventory);
     
@@ -69,9 +74,11 @@ const buyXP = async paramObj => {
 //User error handling is not done, but I'm not sure how to do it,
 //will leave as is for now
 const buyRole = async paramObj => {
+    //Storing variables from parameter object
     const user = paramObj.user;
     const msg = paramObj.msg;
     const newCurrency = paramObj.newCurrency;
+
     const filter = m => m.author.id === user.id;
     const botMaking = msg.guild.channels.get('621148039200899072');
 
@@ -100,6 +107,54 @@ const buyRole = async paramObj => {
 
     return msg.channel.send(`Successfully purchased a custom role.`);
 }
+const buySlot = async paramObj => {
+    //Storing variables from parameter object
+    const user = paramObj.user;
+    const msg = paramObj.msg;
+    const client = paramObj.client;
+
+    const userBank = await fetchBank(user);
+    const currentSlotLevel = userBank.dataValues.slotLevel;
+
+    if(currentSlotLevel >= 6)
+        return msg.reply(` you are at the max slot level!`);
+
+    let currency = userBank.dataValues.currency;
+    const slotPrice = 750 + (250 * currentSlotLevel);
+
+    const newSummoningTime = slotMappings[currentSlotLevel + 1].hours;
+    const newAmountOfCrystals = slotMappings[currentSlotLevel + 1].crystals;
+    let reply = new Discord.RichEmbed()
+                    .setTitle(`Slot Upgrade`)
+                    .setDescription(`Upgrading to slot level ${currentSlotLevel + 1} will make your wait time ${newSummoningTime} hours and produce ${newAmountOfCrystals} ${paramObj.acemoji}.\nReact to upgrade.`)
+                    .addField(`Current Slot Level`, currentSlotLevel)
+                    .addField(`Cost to Upgrade`, slotPrice);
+
+    const sentMsg = await msg.channel.send(reply);
+    await sentMsg.react('✅');
+    await sentMsg.react('❎');
+
+    client.on('messageReactionAdd', async(msgReaction, user) => {
+
+        //Checks for correct message and user
+        if(msgReaction.message.id != sentMsg.id || user.id != msg.author.id) return;
+
+        if(msgReaction.emoji.name === '❎'){
+            sentMsg.delete();
+            return msg.reply(` did not upgrade slot.`)
+        }
+        if(msgReaction.emoji.name === '✅'){
+            sentMsg.delete();
+            currency -= +slotPrice;
+            await Users.update({
+                currency,
+                slotLevel: currentSlotLevel + 1
+            }, {where: {user_id: msg.author.id}})
+            return msg.reply(` upgraded slot level!`);
+        }
+    })
+}
+
 new Item(`XP Booster`, `xp`,
     `Boosts your XP earned by 30% for 3 hours.`,
     200, 0, buyXP);
@@ -120,5 +175,8 @@ new Item(`Jackpot`, `jackpot`,
     `You have a very small chance in winning, ending up victorious gives you a profit of 150 rubees`,
     0, 5, buyMinigame);
 
+new Item(`Upgrade Slot Level`, `slot`,
+    `Upgrades your slot level, meaning faster summoning time and more crystals.`,
+    'Varying', 0, buySlot);
 
 module.exports = items;
