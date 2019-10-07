@@ -29,13 +29,28 @@ const slotMappings = {
     },
 }
 const currentlySummoning = [];
+const msToTime = duration => {
+    let seconds = Math.floor((duration / 1000) % 60),
+    minutes = Math.floor((duration / (1000 * 60)) % 60),
+    hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+  hours = (hours < 10) ? "0" + hours : hours;
+  minutes = (minutes < 10) ? "0" + minutes : minutes;
+  seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+  return `${hours}h:${minutes}m:${seconds}s`;
+}
 module.exports = {
     name: "summon",
     description: "Summon ancient crystals in a few hours. Amount and time depends on your slot level.",
     async execute(msg, args, client){
+
         //If the user is already summoning crystals
-        if(currentlySummoning.includes(msg.author.id)){
-            return msg.reply(` you are already summoning crystals! Please wait X before trying again`);
+        const userFoundSummoning = currentlySummoning.find(o => o.id === msg.author.id);
+
+        if(userFoundSummoning){
+            const timeLeft = msToTime(userFoundSummoning.timeToFinish - (Date.now() - userFoundSummoning.startingTime));
+            return msg.reply(` you are already summoning crystals! Please wait ${timeLeft} before trying again`);
         }
         const userBank = await fetchBank(msg.author);
         const ACEmoji = client.emojis.get(ancientCrystalEmojiID);
@@ -64,20 +79,21 @@ module.exports = {
                 return msg.channel.send(`Did not start summoning crystals`);
             }
             if(msgReaction.emoji.name === '✅'){
+                summoning = true;
+                const timeToFinish  = 1000 * 60 * 60 * hoursToSummonCrystals;
+                currentlySummoning.push({id: msg.author.id, startingTime: Date.now(), timeToFinish});
                 msg.channel.send(`Summoning your crystals, ${msg.author}!`);
-        
                 setTimeout(async() => {
                     const rare_currency = userBank.dataValues.rare_currency + crystalsSummoned;
                     await Users.update({rare_currency}, {where: {user_id: msg.author.id}});
-                    summoned = true;
                     return msg.reply(` summoned your crystals!`);
-                }, 1000 * 60 * 60 * hoursToSummonCrystals);
+                }, timeToFinish);
             }
             sentMsg.delete();
         });
 
         setTimeout(() => {
-            if(summoned) return;
+            if(summoning) return;
             sentMsg.delete();
             return msg.reply(` summoning expired.`);
         }, 1000 * 60 * 2);
